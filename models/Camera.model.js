@@ -1,10 +1,61 @@
 const { Schema, model } = require('mongoose');
 
+const locationsEnum = [
+  'Aveiro',
+  'Beja',
+  'Braga',
+  'Bragança',
+  'Castelo Branco',
+  'Coimbra',
+  'Évora',
+  'Faro',
+  'Guarda',
+  'Ilha da Graciosa',
+  'Ilha da Madeira',
+  'Ilha das Flores',
+  'Ilha de Porto Santo',
+  'Ilha de Santa Maria',
+  'Ilha de São Jorge',
+  'Ilha de São Miguel',
+  'Ilha do Corvo',
+  'Ilha do Faial',
+  'Ilha do Pico',
+  'Ilha Terceira',
+  'Leiria',
+  'Lisboa',
+  'Portalegre',
+  'Porto',
+  'Santarém',
+  'Setúbal',
+  'Viana do Castelo',
+  'Vila Real',
+  'Viseu',
+];
+
 const cameraSchema = new Schema(
   {
     brand: {
       type: String,
       required: [true, 'Brand is required'],
+      enum: [
+        'ARRI',
+        'Blackmagic Design',
+        'Canon',
+        'DJI',
+        'Fujifilm',
+        'GoPro',
+        'Hasselblad',
+        'Leica',
+        'Nikon',
+        'Olympus',
+        'Panasonic',
+        'Pentax',
+        'Phase One',
+        'RED',
+        'Ricoh',
+        'Sigma',
+        'Sony',
+      ],
     },
 
     name: {
@@ -34,7 +85,11 @@ const cameraSchema = new Schema(
     whatsIncluded: String,
     isSelling: Boolean,
     wasSold: Boolean,
-    location: String,
+    location: {
+      type: String,
+      enum: locationsEnum,
+      required: true,
+    },
     user: { type: Schema.Types.ObjectId, ref: 'User' },
   },
   {
@@ -42,5 +97,5 @@ const cameraSchema = new Schema(
     timestamps: true,
   }
 );
-
-module.exports = model('Camera', cameraSchema);
+const Camera = model('Camera', cameraSchema);
+module.exports = Camera;

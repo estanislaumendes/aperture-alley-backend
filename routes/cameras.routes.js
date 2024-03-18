@@ -17,7 +17,7 @@ router.post('/cameras', async (req, res, next) => {
     isSelling,
     wasSold,
     location,
-    userId,
+    user,
   } = req.body;
 
   try {
@@ -30,25 +30,34 @@ router.post('/cameras', async (req, res, next) => {
       condition,
       img,
       whatsIncluded,
-
       isSelling,
       wasSold,
       location,
-      user: userId,
+      user,
     });
 
-    await User.findByIdAndUpdate(userId, {
+    console.log('New camera created:', newCamera);
+
+    console.log('userID', user);
+
+    const updatedUser = await User.findByIdAndUpdate(user, {
       $push: { cameras: newCamera._id },
     });
+
+    console.log('User updated:', updatedUser);
+
     res.status(201).json(newCamera);
   } catch (err) {
-    console.log('An error ocurred creating the camera', err);
+    console.log(
+      'An error occurred creating the camera or updating the user:',
+      err
+    );
     next(err);
   }
 });
 
 // Get all cameras
-router.get('/', async (req, res, next) => {
+router.get('/cameras', async (req, res, next) => {
   try {
     const allCameras = await Camera.find({});
     res.json(allCameras);
@@ -59,12 +68,12 @@ router.get('/', async (req, res, next) => {
 });
 
 // Get a single camera
-router.get('/:id', getCamera, (req, res) => {
+router.get('/cameras/:id', getCamera, (req, res) => {
   res.json(res.camera);
 });
 
 // Update a camera
-router.put('/:id', getCamera, async (req, res, next) => {
+router.put('/cameras/:id', getCamera, async (req, res, next) => {
   const { id } = req.params;
   const {
     brand,
@@ -86,7 +95,7 @@ router.put('/:id', getCamera, async (req, res, next) => {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: 'Id is not valid' });
     }
-    const updatedCamera = await Camera.fin;
+    const updatedCamera = await Camera.findById(id);
     res.json(updatedCamera);
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -95,7 +104,7 @@ router.put('/:id', getCamera, async (req, res, next) => {
 });
 
 // Delete a camera
-router.delete('/:id', getCamera, async (req, res) => {
+router.delete('/cameras/:id', getCamera, async (req, res) => {
   try {
     await res.camera.remove();
     res.json({ message: 'Deleted Camera' });
