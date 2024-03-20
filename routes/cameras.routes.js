@@ -59,7 +59,7 @@ router.post('/cameras', async (req, res, next) => {
 // Get all cameras
 router.get('/cameras', async (req, res, next) => {
   try {
-    const allCameras = await Camera.find({});
+    const allCameras = await Camera.find({}).sort({ createdAt: -1 });
     res.json(allCameras);
   } catch (err) {
     console.log('An error ocurred getting all cameras', err);
@@ -70,6 +70,27 @@ router.get('/cameras', async (req, res, next) => {
 // Get a single camera
 router.get('/cameras/:id', getCamera, (req, res) => {
   res.json(res.camera);
+});
+
+// GET route to retrieve cameras for a specific user
+router.get('/cameras/users/:userId', async (req, res) => {
+  const userId = req.params.userId;
+
+  try {
+    // Find cameras belonging to the specified user
+    const cameras = await Camera.find({ user: userId }).sort({ createdAt: -1 });
+
+    if (!cameras) {
+      return res
+        .status(404)
+        .json({ message: 'Cameras not found for this user' });
+    }
+
+    res.status(200).json(cameras);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
+  }
 });
 
 // Update a camera
