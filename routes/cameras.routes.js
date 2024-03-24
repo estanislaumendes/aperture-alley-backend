@@ -94,7 +94,7 @@ router.get('/cameras/users/:userId', async (req, res) => {
 });
 
 // Update a camera
-router.put('/cameras/:id', getCamera, async (req, res, next) => {
+/* router.put('/cameras/:id', getCamera, async (req, res, next) => {
   const { id } = req.params;
   const {
     brand,
@@ -122,15 +122,86 @@ router.put('/cameras/:id', getCamera, async (req, res, next) => {
     res.status(400).json({ message: err.message });
     next(err);
   }
+}); */
+
+//Update a camara
+
+router.put('/cameras/:id', async (req, res, next) => {
+  const { id } = req.params;
+  const {
+    brand,
+    name,
+    format,
+    model,
+    price,
+    condition,
+    img,
+    whatsIncluded,
+    isSelling,
+    wasSold,
+    location,
+  } = req.body;
+
+  try {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Id is not valid' });
+    }
+    const updatedCamera = await Camera.findByIdAndUpdate(
+      id,
+      {
+        brand,
+        name,
+        format,
+        model,
+        price,
+        condition,
+        img,
+        whatsIncluded,
+        isSelling,
+        wasSold,
+        location,
+      },
+      { new: true }
+    );
+
+    if (!updatedCamera) {
+      return res.status(404).json({ message: 'No camera found' });
+    }
+
+    res.json(updatedCamera);
+  } catch (error) {
+    console.log('An error ocurred updating camera', error);
+    next(error);
+  }
 });
 
 // Delete a camera
-router.delete('/cameras/:id', getCamera, async (req, res) => {
+/* router.delete('/cameras/:id', getCamera, async (req, res) => {
   try {
     await res.camera.remove();
     res.json({ message: 'Deleted Camera' });
   } catch (err) {
     res.status(500).json({ message: err.message });
+  }
+}); */
+
+//Delete a camera
+
+router.delete('/cameras/:id', async (req, res, next) => {
+  const { id } = req.params;
+
+  try {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Id is not valid' });
+    }
+    await Camera.findByIdAndDelete(id);
+
+    await User.deleteMany({ camera: id });
+
+    res.json({ message: 'Camera deleted sucessfuly' });
+  } catch (error) {
+    console.log('An error ocurred deleting camera', error);
+    next(error);
   }
 });
 
