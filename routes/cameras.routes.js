@@ -2,6 +2,7 @@ const router = require('express').Router();
 const Camera = require('../models/Camera.model');
 const mongoose = require('mongoose');
 const User = require('../models/User.model');
+const fileUploader = require('../config/cloudinary.config');
 
 // Create a camera
 router.post('/cameras', async (req, res, next) => {
@@ -219,5 +220,17 @@ async function getCamera(req, res, next) {
   res.camera = camera;
   next();
 }
+
+//upload 5 camera images
+
+router.post('/upload', fileUploader.array('files', 5), (req, res, next) => {
+  try {
+    const paths = req.files.map(file => file.path);
+    res.status(200).json({ img: paths });
+  } catch (error) {
+    console.log('An error occurred uploading the images', error);
+    res.status(400).json({ message: 'An error occurred' });
+  }
+});
 
 module.exports = router;
