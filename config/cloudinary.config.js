@@ -11,7 +11,7 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
   cloudinary,
   params: {
-    allowed_formats: ['jpg', 'png', 'gif', 'jpeg'],
+    allowed_formats: ['jpg', 'png', 'gif', 'jpeg', 'webp'],
     folder: 'aperture-alley/cameras', //name of folder in cloudinary website
   },
 });

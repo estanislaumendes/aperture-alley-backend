@@ -69,8 +69,28 @@ router.get('/cameras', async (req, res, next) => {
 });
 
 // Get a single camera
-router.get('/cameras/:id', getCamera, (req, res) => {
+/* router.get('/cameras/:id', getCamera, (req, res) => {
   res.json(res.camera);
+}); */
+
+//get Cameras by ID
+router.get('/cameras/:id', async (req, res, next) => {
+  const { id } = req.params;
+  try {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Id is not valid' });
+    }
+    const camera = await Camera.findById(id);
+
+    if (!camera) {
+      return res.status(404).json({ message: 'No camera found' });
+    }
+
+    res.json(camera);
+  } catch (error) {
+    console.log('An error ocurred getting camera', error);
+    next(error);
+  }
 });
 
 // GET route to retrieve cameras for a specific user
