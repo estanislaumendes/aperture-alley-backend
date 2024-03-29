@@ -57,21 +57,24 @@ router.post('/cameras', async (req, res, next) => {
   }
 });
 
-// Get all cameras
+// Get all cameras or search for cameras by name
 router.get('/cameras', async (req, res, next) => {
   try {
-    const allCameras = await Camera.find({}).sort({ createdAt: -1 });
-    res.json(allCameras);
+    const { search } = req.query;
+    let query = {};
+
+    // If search query is provided, filter cameras by name
+    if (search) {
+      query = { name: { $regex: new RegExp(search, 'i') } }; // Case-insensitive search
+    }
+
+    const cameras = await Camera.find(query).sort({ createdAt: -1 });
+    res.json(cameras);
   } catch (err) {
-    console.log('An error ocurred getting all cameras', err);
+    console.log('An error occurred getting cameras:', err);
     next(err);
   }
 });
-
-// Get a single camera
-/* router.get('/cameras/:id', getCamera, (req, res) => {
-  res.json(res.camera);
-}); */
 
 //get Cameras by ID
 router.get('/cameras/:id', async (req, res, next) => {
@@ -113,37 +116,6 @@ router.get('/cameras/users/:userId', async (req, res) => {
     res.status(500).json({ message: 'Server Error' });
   }
 });
-
-// Update a camera
-/* router.put('/cameras/:id', getCamera, async (req, res, next) => {
-  const { id } = req.params;
-  const {
-    brand,
-    name,
-    format,
-    model,
-    price,
-    condition,
-    img,
-    whatsIncluded,
-
-    isSelling,
-    wasSold,
-    location,
-    user,
-  } = req.body;
-
-  try {
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: 'Id is not valid' });
-    }
-    const updatedCamera = await Camera.findById(id);
-    res.json(updatedCamera);
-  } catch (err) {
-    res.status(400).json({ message: err.message });
-    next(err);
-  }
-}); */
 
 //Update a camara
 
@@ -195,16 +167,6 @@ router.put('/cameras/:id', async (req, res, next) => {
     next(error);
   }
 });
-
-// Delete a camera
-/* router.delete('/cameras/:id', getCamera, async (req, res) => {
-  try {
-    await res.camera.remove();
-    res.json({ message: 'Deleted Camera' });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-}); */
 
 //Delete a camera
 
